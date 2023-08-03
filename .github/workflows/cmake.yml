@@ -44,11 +44,11 @@ jobs:
       shell: pwsh
       run: |
         cmake `
-            -B "${{ GITHUB_WORKSPACE }}/build" `
+            -B "${{ github.workspace }}/build" `
             -DVCPKG_VERBOSE=ON `
             -DVCPKG_INSTALL_OPTIONS="--debug" `
-            -DCMAKE_TOOLCHAIN_FILE="${{ GITHUB_WORKSPACE }}/vcpkg/scripts/buildsystems/vcpkg.cmake" `
-            "${{ GITHUB_WORKSPACE }}"
+            -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" `
+            "${{ github.workspace }}"
       
     - name: Upload Log Files
       if: always()
