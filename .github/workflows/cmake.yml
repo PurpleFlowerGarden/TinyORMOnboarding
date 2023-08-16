@@ -52,6 +52,11 @@ jobs:
             -source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
         ${{matrix.mono}} $((./vcpkg/vcpkg fetch nuget) | tail -n 1) sources
 
+    - name: apt install
+      if: matrix.os == 'ubuntu-22.04'
+      shell: bash
+      run: apt-get install autoconf-archive
+
     - name: Provision VCPKG
       shell: pwsh
       run: |
