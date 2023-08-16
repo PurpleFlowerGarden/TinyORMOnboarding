@@ -14,7 +14,16 @@ env:
 
 jobs:
   build:
-    runs-on: windows-2022-8-cores
+    strategy:
+      matrix:
+        os: ['windows-2022', 'ubuntu-22.04']
+        include:
+          - os: 'windows-2022'
+            mono: '&'
+          - os: 'ubuntu-22.04'
+            mono: 'mono'
+  
+    runs-on: ${{ matrix.os }}
 
     permissions:
       contents: read
@@ -26,18 +35,22 @@ jobs:
       with:
         submodules: 'recursive'
 
+    - name: Bootstrap VCPKG
+      shell: bash
+      run: ./vcpkg/bootstrap-vcpkg.sh
+
     - name: Setup NuGet
-      shell: pwsh
+      shell: bash
       run: |
-        nuget sources add `
+        ${{matrix.mono}} $($(./vcpkg/vcpkg fetch nuget) | tail -n 1) sources add `
             -source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" `
             -storepasswordincleartext `
             -name "GitHub" `
             -username "${{ github.repository_owner }}" `
             -password "${{ secrets.GITHUB_TOKEN }}"
-        nuget setapikey "${{ secrets.GITHUB_TOKEN }}" `
+        ${{matrix.mono}} $($(./vcpkg/vcpkg fetch nuget) | tail -n 1) setapikey "${{ secrets.GITHUB_TOKEN }}" `
             -source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
-        nuget sources
+        ${{matrix.mono}} $($(./vcpkg/vcpkg fetch nuget) | tail -n 1) sources
 
     - name: Provision VCPKG
       shell: pwsh
