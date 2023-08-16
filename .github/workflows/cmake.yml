@@ -55,7 +55,7 @@ jobs:
     - name: apt install
       if: matrix.os == 'ubuntu-22.04'
       shell: bash
-      run: apt-get install autoconf-archive
+      run: sudo apt install -y autoconf-archive
 
     - name: Provision VCPKG
       shell: pwsh
