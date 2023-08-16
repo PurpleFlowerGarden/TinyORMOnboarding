@@ -12,6 +12,10 @@ env:
   BUILD_TYPE: Release
   VCPKG_BINARY_SOURCES: clear;nuget,GitHub,readwrite;nugettimeout,3600
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build:
     strategy:
@@ -24,10 +28,6 @@ jobs:
             mono: 'mono'
   
     runs-on: ${{ matrix.os }}
-
-    permissions:
-      contents: read
-      packages: write
 
     steps:
     - name: Checkout Repository
