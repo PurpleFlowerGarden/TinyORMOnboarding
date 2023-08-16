@@ -33,7 +33,7 @@ jobs:
     - name: Install Ubuntu dependencies
       if: ${{ matrix.os == 'ubuntu-22.04' }}
       shell: bash
-      run: sudo apt install -y autoconf-archive
+      run: sudo apt-get install autoconf-archive
     
     - name: Checkout Repository
       uses: actions/checkout@v3
