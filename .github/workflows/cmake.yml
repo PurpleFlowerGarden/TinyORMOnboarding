@@ -21,13 +21,16 @@ jobs:
     strategy:
       matrix:
         os: ['windows-2022']
+        vcpkg_library_linkage: ['dynamic', 'static']
         include:
           - os: 'windows-2022'
-            target_triplet: "x64-windows"
             mono: ''
           - os: 'windows-2022'
-            target_triplet: "x64-windows-static"
-            mono: ''
+            vcpkg_library_linkage: 'dynamic'
+            vcpkg_target_triplet: 'x64-windows'
+          - os: 'windows-2022'
+            vcpkg_library_linkage: 'static'
+            vcpkg_target_triplet: 'x64-windows-static'
           #- os: 'ubuntu-22.04'
           #  mono: 'mono'
   
@@ -68,7 +71,7 @@ jobs:
             -B "${{ github.workspace }}/build" \
             -DVCPKG_VERBOSE=ON \
             -DVCPKG_INSTALL_OPTIONS="--debug" \
-            -DVCPKG_TARGET_TRIPLET="${{ matrix.target_triplet }}" \
+            -DVCPKG_TARGET_TRIPLET="${{ matrix.vcpkg_target_triplet }}" \
             -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" \
             "${{ github.workspace }}"
       
