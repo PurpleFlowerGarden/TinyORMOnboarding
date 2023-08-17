@@ -23,10 +23,10 @@ jobs:
         os: ['windows-2022']
         include:
           - os: 'windows-2022'
-            target-triplet: "x64-windows"
+            target_triplet: "x64-windows"
             mono: ''
           - os: 'windows-2022'
-            target-triplet: "x64-windows-static"
+            target_triplet: "x64-windows-static"
             mono: ''
           #- os: 'ubuntu-22.04'
           #  mono: 'mono'
@@ -68,7 +68,7 @@ jobs:
             -B "${{ github.workspace }}/build" \
             -DVCPKG_VERBOSE=ON \
             -DVCPKG_INSTALL_OPTIONS="--debug" \
-            -DVCPKG_TARGET_TRIPLET="${{ matrix.target-tripplet }}" \
+            -DVCPKG_TARGET_TRIPLET="${{ matrix.target_triplet }}" \
             -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" \
             "${{ github.workspace }}"
       
