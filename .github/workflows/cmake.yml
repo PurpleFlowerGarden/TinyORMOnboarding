@@ -23,19 +23,24 @@ jobs:
         os: ['windows-2022', 'ubuntu-22.04']
         vcpkg_library_linkage: ['dynamic', 'static']
         include:
+          - os: 'ubuntu-22.04'
+            mono: 'mono'
           - os: 'windows-2022'
             mono: ''
           - os: 'ubuntu-22.04'
-            mono: 'mono'
+            vcpkg_library_linkage: 'static'
+            vcpkg_target_triplet: 'x64-linux'
           - os: 'windows-2022'
             vcpkg_library_linkage: 'dynamic'
             vcpkg_target_triplet: 'x64-windows'
           - os: 'windows-2022'
             vcpkg_library_linkage: 'static'
             vcpkg_target_triplet: 'x64-windows-static'
+        exclude:
+          - os: 'ubuntu-22.04'
+            vcpkg_library_linkage: 'dynamic'
   
     runs-on: ${{ matrix.os }}
-    if: matrix.vcpkg_target_triplet
 
     steps:
     - name: Install Ubuntu dependencies
