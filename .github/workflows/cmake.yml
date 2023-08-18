@@ -12,41 +12,79 @@ env:
   BUILD_TYPE: Release
   VCPKG_BINARY_SOURCES: clear;nuget,GitHub,readwrite;nugettimeout,3600
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   build:
-    runs-on: windows-2022-8-cores
-
-    permissions:
-      contents: read
-      packages: write
+    strategy:
+      fail-fast: false
+      matrix:
+        os: ['windows-2022', 'ubuntu-22.04']
+        vcpkg_library_linkage: ['dynamic', 'static']
+        include:
+          - os: 'ubuntu-22.04'
+            mono: 'mono'
+          - os: 'windows-2022'
+            mono: ''
+          - os: 'ubuntu-22.04'
+            vcpkg_library_linkage: 'static'
+            vcpkg_target_triplet: 'x64-linux'
+          - os: 'windows-2022'
+            vcpkg_library_linkage: 'dynamic'
+            vcpkg_target_triplet: 'x64-windows'
+          - os: 'windows-2022'
+            vcpkg_library_linkage: 'static'
+            vcpkg_target_triplet: 'x64-windows-static'
+        exclude:
+          - os: 'ubuntu-22.04'
+            vcpkg_library_linkage: 'dynamic'
+  
+    runs-on: ${{ matrix.os }}-8-cores
 
     steps:
+    - name: Install Ubuntu dependencies
+      if: ${{ matrix.os == 'ubuntu-22.04' }}
+      shell: bash
+      run: |
+        sudo apt-get install autoconf-archive
+        sudo apt-get install '^libxcb.*-dev' \
+          libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev \
+          libxkbcommon-x11-dev
+        sudo apt-get install libgl1-mesa-dev mesa-common-dev
+    
     - name: Checkout Repository
       uses: actions/checkout@v3
       with:
         submodules: 'recursive'
 
+    - name: Bootstrap VCPKG
+      shell: bash
+      run: ./vcpkg/bootstrap-vcpkg.sh
+
     - name: Setup NuGet
-      shell: pwsh
+      shell: bash
       run: |
-        nuget sources add `
-            -source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" `
-            -storepasswordincleartext `
-            -name "GitHub" `
-            -username "${{ github.repository_owner }}" `
+        ${{matrix.mono}} $((./vcpkg/vcpkg fetch nuget) | tail -n 1) sources add \
+            -source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
+            -storepasswordincleartext \
+            -name "GitHub" \
+            -username "${{ github.repository_owner }}" \
             -password "${{ secrets.GITHUB_TOKEN }}"
-        nuget setapikey "${{ secrets.GITHUB_TOKEN }}" `
+        ${{matrix.mono}} $((./vcpkg/vcpkg fetch nuget) | tail -n 1) setapikey "${{ secrets.GITHUB_TOKEN }}" \
             -source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
-        nuget sources
+        ${{matrix.mono}} $((./vcpkg/vcpkg fetch nuget) | tail -n 1) sources
 
     - name: Provision VCPKG
-      shell: pwsh
+      shell: bash
       run: |
-        cmake `
-            -B "${{ github.workspace }}/build" `
-            -DVCPKG_VERBOSE=ON `
-            -DVCPKG_INSTALL_OPTIONS="--debug" `
-            -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" `
+        cmake \
+            -B "${{ github.workspace }}/build" \
+            -DVCPKG_VERBOSE=ON \
+            -DVCPKG_INSTALL_OPTIONS="--debug" \
+            -DVCPKG_TARGET_TRIPLET="${{ matrix.vcpkg_target_triplet }}" \
+            -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" \
             "${{ github.workspace }}"
       
     - name: Upload Log Files
