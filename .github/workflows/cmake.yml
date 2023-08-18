@@ -40,7 +40,7 @@ jobs:
           - os: 'ubuntu-22.04'
             vcpkg_library_linkage: 'dynamic'
   
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-8-cores
 
     steps:
     - name: Install Ubuntu dependencies
