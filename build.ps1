@@ -22,6 +22,7 @@ if ("x64-windows", "x64-windows-static" -contains "${env:VCPKG_TARGET_TRIPLET}")
 
 cmake `
 	-B ${env:GITHUB_WORKSPACE}/build `
+	-DCMAKE_BUILD_TYPE="${env:BUILD_TYPE}" `
 	-DVCPKG_VERBOSE=ON `
 	-DVCPKG_INSTALL_OPTIONS="--debug" `
  	-DVCPKG_TARGET_TRIPLET="${env:VCPKG_TARGET_TRIPLET}" `
