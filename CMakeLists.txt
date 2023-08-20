@@ -21,7 +21,7 @@ set_target_properties(QSqlQueryTest PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUNTI
 
 find_package(TinyOrm CONFIG REQUIRED)
 add_executable(TinyOrmQueryTest)
-target_sources(TinyOrmQueryTest PRIVATE MyTinyTest.cpp)
+target_sources(TinyOrmQueryTest PRIVATE TinyOrmQueryTest.cpp)
 target_link_libraries(TinyOrmQueryTest PRIVATE Qt::Core Qt::Sql Qt::Test TinyOrm::TinyOrm)
 set_target_properties(TinyOrmQueryTest PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RUNTIME_LIBRARY})
 

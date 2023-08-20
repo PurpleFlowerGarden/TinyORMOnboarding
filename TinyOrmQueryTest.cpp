@@ -1,4 +1,4 @@
-#include "MyTinyTest.hpp"
+#include "TinyOrmQueryTest.hpp"
 
 namespace MyNamespace
 {
