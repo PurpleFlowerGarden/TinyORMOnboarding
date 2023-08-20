@@ -52,11 +52,16 @@ jobs:
       shell: bash
       run: sudo apt-get install autoconf-archive
     
-    - name: Install ubuntu qtbase dependencies
+    - name: Install ubuntu qtbase dependencies (documented)
       if: ${{ matrix.os == 'ubuntu-22.04' }}
       shell: bash
-      run: sudo apt-get install '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev \
-        libgl1-mesa-dev mesa-common-dev
+      run: sudo apt-get install '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev
+
+    - name: Install ubuntu qtbase dependencies (undocumented)
+      if: ${{ matrix.os == 'ubuntu-22.04' }}
+      shell: bash
+      run: sudo apt-get install libgl1-mesa-dev mesa-common-dev
+        
     
     - name: Checkout Repository
       uses: actions/checkout@v3
