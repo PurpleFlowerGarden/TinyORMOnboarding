@@ -3,7 +3,7 @@ if (${env:GITHUB_WORKSPACE} -eq ${null}) {
 }
 
 if (${env:BUILD_TYPE} -eq ${null}) {
-  ${env:BUILD_TYPE}="debug"
+  ${env:BUILD_TYPE}="Debug"
 }
 
 if (${env:VCPKG_TARGET_TRIPLET} -eq ${null}) {

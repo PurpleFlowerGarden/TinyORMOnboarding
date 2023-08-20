@@ -3,7 +3,7 @@ if (test -z ${GITHUB_WORKSPACE+x}) then
 fi
 
 if (test -z ${BUILD_TYPE+x}) then
-	BUILD_TYPE="debug"
+	BUILD_TYPE="Debug"
 fi
 
 cmake \
