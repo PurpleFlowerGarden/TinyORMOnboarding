@@ -25,7 +25,7 @@ cmake `
 	-DCMAKE_BUILD_TYPE="${env:BUILD_TYPE}" `
 	-DVCPKG_VERBOSE=ON `
 	-DVCPKG_INSTALL_OPTIONS="--debug" `
- 	-DVCPKG_TARGET_TRIPLET="${env:VCPKG_TARGET_TRIPLET}" `
+	-DVCPKG_TARGET_TRIPLET="${env:VCPKG_TARGET_TRIPLET}" `
 	-DCMAKE_TOOLCHAIN_FILE="${env:GITHUB_WORKSPACE}/vcpkg/scripts/buildsystems/vcpkg.cmake" `
 	-DMSVC_RUNTIME_DYNAMIC="${msvc_runtime_dynamic}" `
 	${env:GITHUB_WORKSPACE}
