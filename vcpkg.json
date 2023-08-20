@@ -1,7 +1,14 @@
 {
-  "name": "vcpkg-dependencies",
+  "name": "tiny-orm-onboarding",
   "version-string": "0.0.1",
   "dependencies": [
-    {"name": "tinyorm", "features": [] }
+    {
+      "name": "qtbase",
+      "features": [ "sql", "sql-sqlite" ]
+    },
+    {
+      "name": "tinyorm",
+      "default-features": false
+    }
   ]
 }
