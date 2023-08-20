@@ -3,7 +3,7 @@ if (${env:GITHUB_WORKSPACE} -eq ${null}) {
 }
 
 if (${env:BUILD_TYPE} -eq ${null}) {
-  ${env:BUILD_TYPE}="debug"
+  ${env:BUILD_TYPE}="Debug"
 }
 
 if (${env:VCPKG_TARGET_TRIPLET} -eq ${null}) {
@@ -22,9 +22,10 @@ if ("x64-windows", "x64-windows-static" -contains "${env:VCPKG_TARGET_TRIPLET}")
 
 cmake `
 	-B ${env:GITHUB_WORKSPACE}/build `
+	-DCMAKE_BUILD_TYPE="${env:BUILD_TYPE}" `
 	-DVCPKG_VERBOSE=ON `
 	-DVCPKG_INSTALL_OPTIONS="--debug" `
- 	-DVCPKG_TARGET_TRIPLET="${env:VCPKG_TARGET_TRIPLET}" `
+	-DVCPKG_TARGET_TRIPLET="${env:VCPKG_TARGET_TRIPLET}" `
 	-DCMAKE_TOOLCHAIN_FILE="${env:GITHUB_WORKSPACE}/vcpkg/scripts/buildsystems/vcpkg.cmake" `
 	-DMSVC_RUNTIME_DYNAMIC="${msvc_runtime_dynamic}" `
 	${env:GITHUB_WORKSPACE}

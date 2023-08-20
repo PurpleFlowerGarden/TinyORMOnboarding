@@ -3,11 +3,12 @@ if (test -z ${GITHUB_WORKSPACE+x}) then
 fi
 
 if (test -z ${BUILD_TYPE+x}) then
-	BUILD_TYPE="debug"
+	BUILD_TYPE="Debug"
 fi
 
 cmake \
 	-B "${GITHUB_WORKSPACE}/build" \
+	-DCMAKE_BUILD_TYPE="${BUILD_TYPE}" \
 	-DVCPKG_VERBOSE=ON \
 	-DVCPKG_INSTALL_OPTIONS="--debug" \
 	-DCMAKE_TOOLCHAIN_FILE="${GITHUB_WORKSPACE}/vcpkg/scripts/buildsystems/vcpkg.cmake" \
