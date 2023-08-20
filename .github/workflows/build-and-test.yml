@@ -1,4 +1,4 @@
-name: Build
+name: TinyORM Tests
 
 on:
   push:
@@ -8,13 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
-  BUILD_TYPE: Release
   VCPKG_BINARY_SOURCES: clear;nuget,GitHub,readwrite;nugettimeout,3600
-
-permissions:
-  contents: read
-  packages: write
 
 jobs:
   build:
@@ -23,6 +17,7 @@ jobs:
       matrix:
         os: ['windows-2022', 'ubuntu-22.04']
         vcpkg_library_linkage: ['dynamic', 'static']
+        build_type: ['Debug', 'Release']
         include:
           - os: 'ubuntu-22.04'
             mono: 'mono'
@@ -41,18 +36,32 @@ jobs:
           - os: 'ubuntu-22.04'
             vcpkg_library_linkage: 'dynamic'
   
+    permissions:
+      contents: read
+      packages: write
+  
     runs-on: ${{ matrix.os }}-8-cores
 
+    env:
+      VCPKG_TARGET_TRIPLET: ${{ matrix.vcpkg_target_triplet }}
+      BUILD_TYPE: ${{ matrix.build_type }}
+    
     steps:
-    - name: Install Ubuntu dependencies
+    - name: Install ubuntu icu dependencies
       if: ${{ matrix.os == 'ubuntu-22.04' }}
       shell: bash
-      run: |
-        sudo apt-get install autoconf-archive
-        sudo apt-get install '^libxcb.*-dev' \
-          libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev \
-          libxkbcommon-x11-dev
-        sudo apt-get install libgl1-mesa-dev mesa-common-dev
+      run: sudo apt-get install autoconf-archive
+    
+    - name: Install ubuntu qtbase dependencies (documented)
+      if: ${{ matrix.os == 'ubuntu-22.04' }}
+      shell: bash
+      run: sudo apt-get install '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev
+
+    - name: Install ubuntu qtbase dependencies (undocumented)
+      if: ${{ matrix.os == 'ubuntu-22.04' }}
+      shell: bash
+      run: sudo apt-get install libgl1-mesa-dev mesa-common-dev
+        
     
     - name: Checkout Repository
       uses: actions/checkout@v3
@@ -76,18 +85,15 @@ jobs:
             -source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
         ${{matrix.mono}} $((./vcpkg/vcpkg fetch nuget) | tail -n 1) sources
 
-    - name: Provision VCPKG
-      shell: bash
-      run: |
-        cmake \
-            -B "${{ github.workspace }}/build" \
-            -DVCPKG_VERBOSE=ON \
-            -DVCPKG_INSTALL_OPTIONS="--debug" \
-            -DVCPKG_TARGET_TRIPLET="${{ matrix.vcpkg_target_triplet }}" \
-            -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake" \
-            "${{ github.workspace }}"
+    - name: Build
+      shell: pwsh
+      run: ./build.ps1
       
-    - name: Upload Log Files
+    - name: Run Tests
+      shell: pwsh
+      run: pwsh ./test.ps1
+
+    - name: Archive VCPKG Log Files
       if: always()
       uses: actions/upload-artifact@v3
       with:
@@ -95,3 +101,38 @@ jobs:
         path: |
           vcpkg/buildtrees/*/*.txt
           vcpkg/buildtrees/*/*.log
+
+    - name: Create Test Result Artifact
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: Test Results (${{ matrix.vcpkg_target_triplet }})
+        path: |
+          build/*.xml
+
+          
+          
+  publish-teshresults:
+    name: Publish Test Results
+    needs: build
+    if: >
+      always() &&
+      github.event.sender.login != 'dependabot[bot]' &&
+      ( github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository )
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      pull-requests: write
+      
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+      
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            artifacts/**/*.xml
