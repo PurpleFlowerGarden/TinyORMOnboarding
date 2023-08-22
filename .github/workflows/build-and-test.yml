@@ -14,6 +14,7 @@ jobs:
   build:
     strategy:
       fail-fast: false
+      max-parallel: 1
       matrix:
         os: ['windows-2022', 'ubuntu-22.04']
         vcpkg_library_linkage: ['dynamic', 'static']
