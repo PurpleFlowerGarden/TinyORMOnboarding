@@ -50,6 +50,14 @@ void QSqlQueryTest::cleanup()
 
 void QSqlQueryTest::helloWorld()
 {
+	QSqlQuery query(*this);
+	query.prepare("INSERT INTO foobar(message) VALUES (:message)");
+	query.bindValue(":message", QUrl("www.wikipedia.org").toString());
+	bool success = query.exec();
+	if (!success) {
+		qCritical() << query.lastError().text().toStdString();
+	}
+	QVERIFY(success);
 }
 
 QTEST_MAIN(QSqlQueryTest)
