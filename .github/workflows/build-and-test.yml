@@ -14,7 +14,6 @@ jobs:
   build:
     strategy:
       fail-fast: false
-      max-parallel: 1
       matrix:
         os: ['windows-2022', 'ubuntu-22.04']
         vcpkg_library_linkage: ['dynamic', 'static']
@@ -48,6 +47,11 @@ jobs:
       BUILD_TYPE: ${{ matrix.build_type }}
     
     steps:
+    - name: Update ubuntu repository
+      if: ${{ matrix.os == 'ubuntu-22.04' }}
+      shell: bash
+      run: sudo apt-get update
+      
     - name: Install ubuntu icu dependencies
       if: ${{ matrix.os == 'ubuntu-22.04' }}
       shell: bash
