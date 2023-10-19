@@ -63,12 +63,7 @@ jobs:
       if: ${{ matrix.os == 'ubuntu-22.04' }}
       shell: bash
       run: sudo sudo apt-get install ninja-build
-      
-    - name: Install windows Ninja
-      if: ${{ matrix.os == 'windows-2022' }}
-      shell: pwsh
-      run: choco install ninja    
-    
+          
     - name: Checkout Repository
       uses: actions/checkout@v3
       with:
@@ -91,7 +86,20 @@ jobs:
             -source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
         ${{matrix.mono}} $((./vcpkg/vcpkg fetch nuget) | tail -n 1) sources
       
-    - name: Configure
+    - name: Configure (VsDevShell)
+      if: ${{ matrix.os == 'windows-2022' }}
+      shell: pwsh
+      run: |
+        $vsInstallationPath=(& "${env:ProgramFiles(x86)}/Microsoft Visual Studio/Installer/vswhere.exe" -requires "Microsoft.VisualStudio.Component.Windows11SDK.*" -property "installationPath")
+        Import-Module "${vsInstallationPath}/Common7/Tools/Microsoft.VisualStudio.DevShell.dll"
+        # invoking vcvarsall leaves the shell in another directory...
+        pushd .
+        	Enter-VsDevShell -VsInstallPath ${vsInstallationPath}
+        popd
+        cmake --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
+
+    - name: Configure (non VsDevShell)
+      if: ${{ matrix.os != 'windows-2022' }}
       shell: pwsh
       run: cmake --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
 
