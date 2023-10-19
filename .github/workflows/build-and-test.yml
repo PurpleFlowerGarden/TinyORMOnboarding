@@ -58,9 +58,16 @@ jobs:
       if: ${{ matrix.os == 'ubuntu-22.04' }}
       shell: bash
       run: sudo apt-get install libgl1-mesa-dev mesa-common-dev
+    
+    - name: Install ubuntu Ninja
+      if: ${{ matrix.os == 'ubuntu-22.04' }}
+      shell: bash
+      run: sudo sudo apt-get install ninja-build
       
-    - name: Install Ninja
-      uses: seanmiddleditch/gha-setup-ninja@v4
+    - name: Install windows Ninja
+      if: ${{ matrix.os == 'windows-2022' }}
+      shell: pwsh
+      run: choco install ninja    
     
     - name: Checkout Repository
       uses: actions/checkout@v3
