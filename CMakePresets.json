@@ -165,36 +165,52 @@
       "configurePreset": "release"
     },
     {
+      "name": "ci",
+      "output": {
+        "outputJUnitFile": "${sourceDir}/build/ctest.xml",
+        "verbosity": "extra"
+      },
+      "hidden": true
+    },
+    {
       "name": "ci-ninja-x64-windows-debug",
-      "configurePreset": "ci-ninja-x64-windows-debug"
+      "configurePreset": "ci-ninja-x64-windows-debug",
+      "inherits": ["ci"]
     },
     {
       "name": "ci-ninja-x64-windows-release",
-      "configurePreset": "ci-ninja-x64-windows-release"
+      "configurePreset": "ci-ninja-x64-windows-release",
+      "inherits": ["ci"]
     },
     {
       "name": "ci-ninja-x64-windows-static-debug",
-      "configurePreset": "ci-ninja-x64-windows-static-debug"
+      "configurePreset": "ci-ninja-x64-windows-static-debug",
+      "inherits": ["ci"]
     },
     {
       "name": "ci-ninja-x64-windows-static-release",
-      "configurePreset": "ci-ninja-x64-windows-static-release"
+      "configurePreset": "ci-ninja-x64-windows-static-release",
+      "inherits": ["ci"]
     },
     {
       "name": "ci-ninja-x64-linux-debug",
-      "configurePreset": "ci-ninja-x64-linux-debug"
+      "configurePreset": "ci-ninja-x64-linux-debug",
+      "inherits": ["ci"]
     },
     {
       "name": "ci-ninja-x64-linux-release",
-      "configurePreset": "ci-ninja-x64-linux-release"
+      "configurePreset": "ci-ninja-x64-linux-release",
+      "inherits": ["ci"]
     },
     {
       "name": "ci-ninja-x64-freebsd-debug",
-      "configurePreset": "ci-ninja-x64-freebsd-debug"
+      "configurePreset": "ci-ninja-x64-freebsd-debug",
+      "inherits": ["ci"]
     },
     {
       "name": "ci-ninja-x64-freebsd-release",
-      "configurePreset": "ci-ninja-x64-freebsd-release"
+      "configurePreset": "ci-ninja-x64-freebsd-release",
+      "inherits": ["ci"]
     }
   ]
 }
