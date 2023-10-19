@@ -15,26 +15,19 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['windows-2022', 'ubuntu-22.04']
-        vcpkg_library_linkage: ['dynamic', 'static']
-        build_type: ['Debug', 'Release']
+        generator: ['ninja']
+        vcpkg_target_triplet: ['x64-windows', 'x64-windows-static', 'x64-linux']
+        build_type: ['debug', 'release']
         include:
-          - os: 'ubuntu-22.04'
+          - vcpkg_target_triplet: 'x64-linux'
             mono: 'mono'
-          - os: 'windows-2022'
+            os: 'ubuntu-22.04'
+          - vcpkg_target_triplet: 'x64-windows'
             mono: ''
-          - os: 'ubuntu-22.04'
-            vcpkg_library_linkage: 'static'
-            vcpkg_target_triplet: 'x64-linux'
-          - os: 'windows-2022'
-            vcpkg_library_linkage: 'dynamic'
-            vcpkg_target_triplet: 'x64-windows'
-          - os: 'windows-2022'
-            vcpkg_library_linkage: 'static'
-            vcpkg_target_triplet: 'x64-windows-static'
-        exclude:
-          - os: 'ubuntu-22.04'
-            vcpkg_library_linkage: 'dynamic'
+            os: 'windows-2022'
+          - vcpkg_target_triplet: 'x64-windows-static'
+            mono: ''
+            os: 'windows-2022'
   
     permissions:
       contents: read
@@ -44,7 +37,6 @@ jobs:
 
     env:
       VCPKG_TARGET_TRIPLET: ${{ matrix.vcpkg_target_triplet }}
-      BUILD_TYPE: ${{ matrix.build_type }}
     
     steps:
     - name: Update ubuntu repository
@@ -90,13 +82,17 @@ jobs:
             -source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
         ${{matrix.mono}} $((./vcpkg/vcpkg fetch nuget) | tail -n 1) sources
 
+    - name: Configure
+      shell: pwsh
+      run: cmake --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
+
     - name: Build
       shell: pwsh
-      run: ./build.ps1
+      run: cmake --build --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
       
-    - name: Run Tests
+    - name: Test
       shell: pwsh
-      run: pwsh ./test.ps1
+      run: ctest --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
 
     - name: Archive VCPKG Log Files
       if: always()
