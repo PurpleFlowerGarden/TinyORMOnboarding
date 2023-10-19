@@ -38,7 +38,7 @@
     },
     {
       "name": "ninja",
-      "generator": "Ninja",
+      "generator": "Ninja Multi-Config",
       "hidden": true
     },
     {
