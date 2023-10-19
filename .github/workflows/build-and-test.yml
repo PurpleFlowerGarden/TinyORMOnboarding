@@ -48,6 +48,13 @@ jobs:
       BUILD_TYPE: ${{ matrix.build_type }}
     
     steps:
+    - name: Update ubuntu repository
+      if: ${{ matrix.os == 'ubuntu-22.04' }}
+      shell: bash
+      run: |
+        sudo apt-get update
+        sudo apt-get upgrade
+      
     - name: Install ubuntu icu dependencies
       if: ${{ matrix.os == 'ubuntu-22.04' }}
       shell: bash
