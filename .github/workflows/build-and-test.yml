@@ -58,7 +58,9 @@ jobs:
       if: ${{ matrix.os == 'ubuntu-22.04' }}
       shell: bash
       run: sudo apt-get install libgl1-mesa-dev mesa-common-dev
-        
+      
+    - name: Install Ninja
+      uses: seanmiddleditch/gha-setup-ninja@v4
     
     - name: Checkout Repository
       uses: actions/checkout@v3
@@ -81,7 +83,7 @@ jobs:
         ${{matrix.mono}} $((./vcpkg/vcpkg fetch nuget) | tail -n 1) setapikey "${{ secrets.GITHUB_TOKEN }}" \
             -source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
         ${{matrix.mono}} $((./vcpkg/vcpkg fetch nuget) | tail -n 1) sources
-
+      
     - name: Configure
       shell: pwsh
       run: cmake --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
