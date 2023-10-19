@@ -18,7 +18,6 @@
     },
     {
       "name": "debug",
-      "binaryDir": "${sourceDir}/Debug",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug"
       },
@@ -26,11 +25,82 @@
     },
     {
       "name": "release",
-      "binaryDir": "${sourceDir}/Release",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release"
       },
       "inherits": [ "base" ]
+    },
+    
+    {
+      "name": "ci",
+      "binaryDir": "${sourceDir}/build",
+      "hidden": true
+    },
+    {
+      "name": "ninja",
+      "generator": "Ninja",
+      "hidden": true
+    },
+    {
+      "name": "x64-windows",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-windows"
+      },
+      "hidden": true
+    },
+    {
+      "name": "x64-windows-static",
+      "cacheVariables": {
+        "MSVC_RUNTIME_DYNAMIC": "OFF",
+        "VCPKG_TARGET_TRIPLET": "x64-windows-static"
+      },
+      "hidden": true
+    },
+    {
+      "name": "x64-linux",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-linux"
+      },
+      "hidden": true
+    },
+    {
+      "name": "x64-freebsd",
+      "cacheVariables": {
+        "VCPKG_TARGET_TRIPLET": "x64-freebsd"
+      },
+      "hidden": true
+    },
+    {
+      "name": "ci-ninja-x64-windows-release",
+      "inherits": ["ci", "ninja", "x64-windows", "release"]
+    },
+    {
+      "name": "ci-ninja-x64-windows-debug",
+      "inherits": ["ci", "ninja", "x64-windows", "debug"]
+    },
+    {
+      "name": "ci-ninja-x64-windows-static-release",
+      "inherits": ["ci", "ninja", "x64-windows-static", "release"]
+    },
+    {
+      "name": "ci-ninja-x64-windows-static-debug",
+      "inherits": ["ci", "ninja", "x64-windows-static", "debug"]
+    },
+    {
+      "name": "ci-ninja-x64-linux-release",
+      "inherits": ["ci", "ninja", "x64-linux", "release"]
+    },
+    {
+      "name": "ci-ninja-x64-linux-debug",
+      "inherits": ["ci", "ninja", "x64-linux", "debug"]
+    },
+    {
+      "name": "ci-ninja-x64-freebsd-release",
+      "inherits": ["ci", "ninja", "x64-freebsd", "release"]
+    },
+    {
+      "name": "ci-ninja-x64-freebsd-debug",
+      "inherits": ["ci", "ninja", "x64-freebsd", "debug"]
     }
   ],
   "buildPresets": [
@@ -43,6 +113,88 @@
       "name": "release",
       "configurePreset": "release",
       "configuration": "Release"
+    },
+    {
+      "name": "ci-ninja-x64-windows-debug",
+      "configurePreset": "ci-ninja-x64-windows-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "ci-ninja-x64-windows-release",
+      "configurePreset": "ci-ninja-x64-windows-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "ci-ninja-x64-windows-static-debug",
+      "configurePreset": "ci-ninja-x64-windows-static-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "ci-ninja-x64-windows-static-release",
+      "configurePreset": "ci-ninja-x64-windows-static-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "ci-ninja-x64-linux-debug",
+      "configurePreset": "ci-ninja-x64-linux-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "ci-ninja-x64-linux-release",
+      "configurePreset": "ci-ninja-x64-linux-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "ci-ninja-x64-freebsd-debug",
+      "configurePreset": "ci-ninja-x64-freebsd-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "ci-ninja-x64-freebsd-release",
+      "configurePreset": "ci-ninja-x64-freebsd-release",
+      "configuration": "Release"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "debug",
+      "configurePreset": "debug"
+    },
+    {
+      "name": "release",
+      "configurePreset": "release"
+    },
+    {
+      "name": "ci-ninja-x64-windows-debug",
+      "configurePreset": "ci-ninja-x64-windows-debug"
+    },
+    {
+      "name": "ci-ninja-x64-windows-release",
+      "configurePreset": "ci-ninja-x64-windows-release"
+    },
+    {
+      "name": "ci-ninja-x64-windows-static-debug",
+      "configurePreset": "ci-ninja-x64-windows-static-debug"
+    },
+    {
+      "name": "ci-ninja-x64-windows-static-release",
+      "configurePreset": "ci-ninja-x64-windows-static-release"
+    },
+    {
+      "name": "ci-ninja-x64-linux-debug",
+      "configurePreset": "ci-ninja-x64-linux-debug"
+    },
+    {
+      "name": "ci-ninja-x64-linux-release",
+      "configurePreset": "ci-ninja-x64-linux-release"
+    },
+    {
+      "name": "ci-ninja-x64-freebsd-debug",
+      "configurePreset": "ci-ninja-x64-freebsd-debug"
+    },
+    {
+      "name": "ci-ninja-x64-freebsd-release",
+      "configurePreset": "ci-ninja-x64-freebsd-release"
     }
   ]
 }
