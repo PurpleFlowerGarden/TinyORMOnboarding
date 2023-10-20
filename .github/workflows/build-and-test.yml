@@ -94,7 +94,7 @@ jobs:
       run: |
         & "${env:ProgramFiles(x86)}/Microsoft Visual Studio/Installer/vswhere.exe" -requires "Microsoft.VisualStudio.Component.Windows11SDK.*"
       
-    - name: Build (VsDevShell)
+    - name: CMake Workflow (VsDevShell)
       if: ${{ matrix.os == 'windows-2022' }}
       shell: pwsh
       run: |
@@ -106,13 +106,15 @@ jobs:
         popd
         cmake --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
         cmake --build --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
+        ctest --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
 
-    - name: Build (non VsDevShell)
+    - name: CMake Workflow (non VsDevShell)
       if: ${{ matrix.os != 'windows-2022' }}
       shell: pwsh
       run: |
         cmake --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
         cmake --build --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
+        ctest --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
 
     - name: Archive VCPKG Log Files
       if: always()
