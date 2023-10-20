@@ -4,10 +4,18 @@ The scope of this project is to provision TinyORM and all dependencies using VCP
 
 Run
 
-    pwsh build.ps1
+    cmake --list-presets
     
-to build, and then
+to list the current CI presets. If any of the CI presets is representative enough, they can be used to build and run the tests using e.g.
 
-    pwsh test.ps1
+    cmake --preset ci-ninja-x64-freebsd-release
+    cmake --build --preset ci-ninja-x64-freebsd-release
+    ctest --preset ci-ninja-x64-freebsd-release
+    
+to build using the `ci-ninja-x64-freebsd-release` preset.
 
-to run the bundled test case.
+If none of the presets is eligable, the `debug` and `release` presets can be used, though they don't configure a build path nor generator, and the ctest runner can't be used as straightforwardedly:
+
+    cmake --preset release -B mybuildpath
+    cmake --build mybuildpath --preset release
+    pushd mybuildpath && ctest -C Release; popd

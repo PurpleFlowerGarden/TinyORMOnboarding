@@ -1,10 +1,8 @@
-name: TinyORM Tests
+name: All Presets
 
 on:
   push:
     branches: [ "main" ]
-  pull_request:
-    branches: [ "*" ]
   workflow_dispatch:
 
 env:
@@ -15,36 +13,65 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: ['windows-2022', 'ubuntu-22.04']
-        vcpkg_library_linkage: ['dynamic', 'static']
-        build_type: ['Debug', 'Release']
+        generator: ['ninja', 'ninjamulti']
+        vcpkg_target_triplet: ['x64-windows', 'x64-windows-static', 'x64-linux']
+        build_type: ['debug', 'release']
         include:
-          - os: 'ubuntu-22.04'
+          - vcpkg_target_triplet: 'x64-linux'
             mono: 'mono'
-          - os: 'windows-2022'
+            os: 'ubuntu-22.04'
+          - vcpkg_target_triplet: 'x64-windows'
             mono: ''
-          - os: 'ubuntu-22.04'
-            vcpkg_library_linkage: 'static'
+            os: 'windows-2022'
+            VsDevShellArch: 'amd64'
+          - vcpkg_target_triplet: 'x64-windows-static'
+            mono: ''
+            os: 'windows-2022'
+            VsDevShellArch: 'amd64'
+          
+          - generator: 'make'
             vcpkg_target_triplet: 'x64-linux'
-          - os: 'windows-2022'
-            vcpkg_library_linkage: 'dynamic'
+            build_type: 'debug'
+            mono: 'mono'
+            os: 'ubuntu-22.04'
+          - generator: 'make'
+            vcpkg_target_triplet: 'x64-linux'
+            build_type: 'release'
+            mono: 'mono'
+            os: 'ubuntu-22.04'
+          - generator: 'vs2022'
             vcpkg_target_triplet: 'x64-windows'
-          - os: 'windows-2022'
-            vcpkg_library_linkage: 'static'
+            build_type: 'debug'
+            mono: ''
+            os: 'windows-2022'
+            VsDevShellArch: 'amd64'
+          - generator: 'vs2022'
+            vcpkg_target_triplet: 'x64-windows'
+            build_type: 'release'
+            mono: ''
+            os: 'windows-2022'
+            VsDevShellArch: 'amd64'
+          - generator: 'vs2022'
             vcpkg_target_triplet: 'x64-windows-static'
-        exclude:
-          - os: 'ubuntu-22.04'
-            vcpkg_library_linkage: 'dynamic'
+            build_type: 'debug'
+            mono: ''
+            os: 'windows-2022'
+            VsDevShellArch: 'amd64'
+          - generator: 'vs2022'
+            vcpkg_target_triplet: 'x64-windows-static'
+            build_type: 'release'
+            mono: ''
+            os: 'windows-2022'
+            VsDevShellArch: 'amd64'
   
     permissions:
       contents: read
       packages: write
   
-    runs-on: ${{ matrix.os }}-8-cores
+    runs-on: ${{ matrix.os }}-8-cores       
 
     env:
       VCPKG_TARGET_TRIPLET: ${{ matrix.vcpkg_target_triplet }}
-      BUILD_TYPE: ${{ matrix.build_type }}
     
     steps:
     - name: Update ubuntu repository
@@ -66,8 +93,12 @@ jobs:
       if: ${{ matrix.os == 'ubuntu-22.04' }}
       shell: bash
       run: sudo apt-get install libgl1-mesa-dev mesa-common-dev
-        
     
+    - name: Install ubuntu Ninja
+      if: ${{ matrix.os == 'ubuntu-22.04' }}
+      shell: bash
+      run: sudo sudo apt-get install ninja-build
+          
     - name: Checkout Repository
       uses: actions/checkout@v3
       with:
@@ -89,14 +120,34 @@ jobs:
         ${{matrix.mono}} $((./vcpkg/vcpkg fetch nuget) | tail -n 1) setapikey "${{ secrets.GITHUB_TOKEN }}" \
             -source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
         ${{matrix.mono}} $((./vcpkg/vcpkg fetch nuget) | tail -n 1) sources
-
-    - name: Build
-      shell: pwsh
-      run: ./build.ps1
       
-    - name: Run Tests
+    - name: Print VsDevShells
+      if: ${{ matrix.os == 'windows-2022' }}
       shell: pwsh
-      run: pwsh ./test.ps1
+      run: |
+        & "${env:ProgramFiles(x86)}/Microsoft Visual Studio/Installer/vswhere.exe" -requires "Microsoft.VisualStudio.Component.Windows11SDK.*"
+      
+    - name: CMake Workflow (VsDevShell)
+      if: ${{ matrix.os == 'windows-2022' }}
+      shell: pwsh
+      run: |
+        $vsInstallationPath=(& "${env:ProgramFiles(x86)}/Microsoft Visual Studio/Installer/vswhere.exe" -requires "Microsoft.VisualStudio.Component.Windows11SDK.*" -property "installationPath")
+        Import-Module "${vsInstallationPath}/Common7/Tools/Microsoft.VisualStudio.DevShell.dll"
+        # invoking vcvarsall leaves the shell in another directory...
+        pushd .
+        	Enter-VsDevShell -VsInstallPath ${vsInstallationPath} -Arch ${{ matrix.VsDevShellArch }}
+        popd
+        cmake --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
+        cmake --build --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
+        ctest --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
+
+    - name: CMake Workflow (non VsDevShell)
+      if: ${{ matrix.os != 'windows-2022' }}
+      shell: pwsh
+      run: |
+        cmake --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
+        cmake --build --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
+        ctest --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
 
     - name: Archive VCPKG Log Files
       if: always()

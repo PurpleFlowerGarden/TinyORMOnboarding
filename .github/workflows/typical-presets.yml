@@ -1,0 +1,158 @@
+name: Typical Presets
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "*" ]
+  workflow_dispatch:
+
+env:
+  VCPKG_BINARY_SOURCES: clear;nuget,GitHub,readwrite;nugettimeout,3600
+
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        vcpkg_target_triplet: ['x64-windows', 'x64-linux']
+        build_type: ['release']
+        include:
+          - vcpkg_target_triplet: 'x64-linux'
+            mono: 'mono'
+            os: 'ubuntu-22.04'
+            generator: 'make'
+          - vcpkg_target_triplet: 'x64-windows'
+            mono: ''
+            os: 'windows-2022'
+            VsDevShellArch: 'amd64'
+            generator: 'vs2022'
+  
+    permissions:
+      contents: read
+      packages: write
+  
+    runs-on: ${{ matrix.os }}-8-cores       
+
+    env:
+      VCPKG_TARGET_TRIPLET: ${{ matrix.vcpkg_target_triplet }}
+    
+    steps:
+    - name: Update ubuntu repository
+      if: ${{ matrix.os == 'ubuntu-22.04' }}
+      shell: bash
+      run: sudo apt-get update
+      
+    - name: Install ubuntu icu dependencies
+      if: ${{ matrix.os == 'ubuntu-22.04' }}
+      shell: bash
+      run: sudo apt-get install autoconf-archive
+    
+    - name: Install ubuntu qtbase dependencies (documented)
+      if: ${{ matrix.os == 'ubuntu-22.04' }}
+      shell: bash
+      run: sudo apt-get install '^libxcb.*-dev' libx11-xcb-dev libglu1-mesa-dev libxrender-dev libxi-dev libxkbcommon-dev libxkbcommon-x11-dev
+
+    - name: Install ubuntu qtbase dependencies (undocumented)
+      if: ${{ matrix.os == 'ubuntu-22.04' }}
+      shell: bash
+      run: sudo apt-get install libgl1-mesa-dev mesa-common-dev
+    
+    - name: Install ubuntu Ninja
+      if: ${{ matrix.os == 'ubuntu-22.04' }}
+      shell: bash
+      run: sudo sudo apt-get install ninja-build
+          
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+      with:
+        submodules: 'recursive'
+
+    - name: Bootstrap VCPKG
+      shell: bash
+      run: ./vcpkg/bootstrap-vcpkg.sh
+
+    - name: Setup NuGet
+      shell: bash
+      run: |
+        ${{matrix.mono}} $((./vcpkg/vcpkg fetch nuget) | tail -n 1) sources add \
+            -source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json" \
+            -storepasswordincleartext \
+            -name "GitHub" \
+            -username "${{ github.repository_owner }}" \
+            -password "${{ secrets.GITHUB_TOKEN }}"
+        ${{matrix.mono}} $((./vcpkg/vcpkg fetch nuget) | tail -n 1) setapikey "${{ secrets.GITHUB_TOKEN }}" \
+            -source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+        ${{matrix.mono}} $((./vcpkg/vcpkg fetch nuget) | tail -n 1) sources
+      
+    - name: Print VsDevShells
+      if: ${{ matrix.os == 'windows-2022' }}
+      shell: pwsh
+      run: |
+        & "${env:ProgramFiles(x86)}/Microsoft Visual Studio/Installer/vswhere.exe" -requires "Microsoft.VisualStudio.Component.Windows11SDK.*"
+      
+    - name: CMake Workflow (VsDevShell)
+      if: ${{ matrix.os == 'windows-2022' }}
+      shell: pwsh
+      run: |
+        $vsInstallationPath=(& "${env:ProgramFiles(x86)}/Microsoft Visual Studio/Installer/vswhere.exe" -requires "Microsoft.VisualStudio.Component.Windows11SDK.*" -property "installationPath")
+        Import-Module "${vsInstallationPath}/Common7/Tools/Microsoft.VisualStudio.DevShell.dll"
+        # invoking vcvarsall leaves the shell in another directory...
+        pushd .
+        	Enter-VsDevShell -VsInstallPath ${vsInstallationPath} -Arch ${{ matrix.VsDevShellArch }}
+        popd
+        cmake --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
+        cmake --build --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
+        ctest --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
+
+    - name: CMake Workflow (non VsDevShell)
+      if: ${{ matrix.os != 'windows-2022' }}
+      shell: pwsh
+      run: |
+        cmake --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
+        cmake --build --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
+        ctest --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
+
+    - name: Archive VCPKG Log Files
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: buildlogs
+        path: |
+          vcpkg/buildtrees/*/*.txt
+          vcpkg/buildtrees/*/*.log
+
+    - name: Create Test Result Artifact
+      if: always()
+      uses: actions/upload-artifact@v3
+      with:
+        name: Test Results (${{ matrix.vcpkg_target_triplet }})
+        path: |
+          build/*.xml
+
+          
+          
+  publish-teshresults:
+    name: Publish Test Results
+    needs: build
+    if: >
+      always() &&
+      github.event.sender.login != 'dependabot[bot]' &&
+      ( github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name == github.repository )
+    runs-on: ubuntu-latest
+    permissions:
+      checks: write
+      pull-requests: write
+      
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts
+      
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          files: |
+            artifacts/**/*.xml
