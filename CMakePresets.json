@@ -38,6 +38,11 @@
     },
     {
       "name": "ninja",
+      "generator": "Ninja",
+      "hidden": true
+    },
+    {
+      "name": "ninjamulti",
       "generator": "Ninja Multi-Config",
       "hidden": true
     },
@@ -101,6 +106,38 @@
     {
       "name": "ci-ninja-x64-freebsd-debug",
       "inherits": ["ci", "ninja", "x64-freebsd", "debug"]
+    },
+    {
+      "name": "ci-ninjamulti-x64-windows-release",
+      "inherits": ["ci", "ninjamulti", "x64-windows", "release"]
+    },
+    {
+      "name": "ci-ninjamulti-x64-windows-debug",
+      "inherits": ["ci", "ninjamulti", "x64-windows", "debug"]
+    },
+    {
+      "name": "ci-ninjamulti-x64-windows-static-release",
+      "inherits": ["ci", "ninjamulti", "x64-windows-static", "release"]
+    },
+    {
+      "name": "ci-ninjamulti-x64-windows-static-debug",
+      "inherits": ["ci", "ninjamulti", "x64-windows-static", "debug"]
+    },
+    {
+      "name": "ci-ninjamulti-x64-linux-release",
+      "inherits": ["ci", "ninjamulti", "x64-linux", "release"]
+    },
+    {
+      "name": "ci-ninjamulti-x64-linux-debug",
+      "inherits": ["ci", "ninjamulti", "x64-linux", "debug"]
+    },
+    {
+      "name": "ci-ninjamulti-x64-freebsd-release",
+      "inherits": ["ci", "ninjamulti", "x64-freebsd", "release"]
+    },
+    {
+      "name": "ci-ninjamulti-x64-freebsd-debug",
+      "inherits": ["ci", "ninjamulti", "x64-freebsd", "debug"]
     }
   ],
   "buildPresets": [
@@ -152,6 +189,46 @@
     {
       "name": "ci-ninja-x64-freebsd-release",
       "configurePreset": "ci-ninja-x64-freebsd-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "ci-ninjamulti-x64-windows-debug",
+      "configurePreset": "ci-ninjamulti-x64-windows-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "ci-ninjamulti-x64-windows-release",
+      "configurePreset": "ci-ninjamulti-x64-windows-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "ci-ninjamulti-x64-windows-static-debug",
+      "configurePreset": "ci-ninjamulti-x64-windows-static-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "ci-ninjamulti-x64-windows-static-release",
+      "configurePreset": "ci-ninjamulti-x64-windows-static-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "ci-ninjamulti-x64-linux-debug",
+      "configurePreset": "ci-ninjamulti-x64-linux-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "ci-ninjamulti-x64-linux-release",
+      "configurePreset": "ci-ninjamulti-x64-linux-release",
+      "configuration": "Release"
+    },
+    {
+      "name": "ci-ninjamulti-x64-freebsd-debug",
+      "configurePreset": "ci-ninjamulti-x64-freebsd-debug",
+      "configuration": "Debug"
+    },
+    {
+      "name": "ci-ninjamulti-x64-freebsd-release",
+      "configurePreset": "ci-ninjamulti-x64-freebsd-release",
       "configuration": "Release"
     }
   ],
@@ -212,6 +289,46 @@
     {
       "name": "ci-ninja-x64-freebsd-release",
       "configurePreset": "ci-ninja-x64-freebsd-release",
+      "inherits": ["ci", "release"]
+    },
+    {
+      "name": "ci-ninjamulti-x64-windows-debug",
+      "configurePreset": "ci-ninjamulti-x64-windows-debug",
+      "inherits": ["ci", "debug"]
+    },
+    {
+      "name": "ci-ninjamulti-x64-windows-release",
+      "configurePreset": "ci-ninjamulti-x64-windows-release",
+      "inherits": ["ci", "release"]
+    },
+    {
+      "name": "ci-ninjamulti-x64-windows-static-debug",
+      "configurePreset": "ci-ninjamulti-x64-windows-static-debug",
+      "inherits": ["ci", "debug"]
+    },
+    {
+      "name": "ci-ninjamulti-x64-windows-static-release",
+      "configurePreset": "ci-ninjamulti-x64-windows-static-release",
+      "inherits": ["ci", "release"]
+    },
+    {
+      "name": "ci-ninjamulti-x64-linux-debug",
+      "configurePreset": "ci-ninjamulti-x64-linux-debug",
+      "inherits": ["ci", "debug"]
+    },
+    {
+      "name": "ci-ninjamulti-x64-linux-release",
+      "configurePreset": "ci-ninjamulti-x64-linux-release",
+      "inherits": ["ci", "release"]
+    },
+    {
+      "name": "ci-ninjamulti-x64-freebsd-debug",
+      "configurePreset": "ci-ninjamulti-x64-freebsd-debug",
+      "inherits": ["ci", "debug"]
+    },
+    {
+      "name": "ci-ninjamulti-x64-freebsd-release",
+      "configurePreset": "ci-ninjamulti-x64-freebsd-release",
       "inherits": ["ci", "release"]
     }
   ]

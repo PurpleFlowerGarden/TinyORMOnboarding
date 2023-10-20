@@ -15,7 +15,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        generator: ['ninja']
+        generator: ['ninja', 'ninjamulti']
         vcpkg_target_triplet: ['x64-windows', 'x64-windows-static', 'x64-linux']
         build_type: ['debug', 'release']
         include:
