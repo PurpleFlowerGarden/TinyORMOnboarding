@@ -25,9 +25,11 @@ jobs:
           - vcpkg_target_triplet: 'x64-windows'
             mono: ''
             os: 'windows-2022'
+            VsDevShellArch: 'amd64'
           - vcpkg_target_triplet: 'x64-windows-static'
             mono: ''
             os: 'windows-2022'
+            VsDevShellArch: 'amd64'
   
     permissions:
       contents: read
@@ -94,7 +96,7 @@ jobs:
         Import-Module "${vsInstallationPath}/Common7/Tools/Microsoft.VisualStudio.DevShell.dll"
         # invoking vcvarsall leaves the shell in another directory...
         pushd .
-        	Enter-VsDevShell -VsInstallPath ${vsInstallationPath}
+        	Enter-VsDevShell -VsInstallPath ${vsInstallationPath} -Arch ${{ matrix.VsDevShellArch }}
         popd
         cmake --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
 
