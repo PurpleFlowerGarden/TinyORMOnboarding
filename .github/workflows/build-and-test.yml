@@ -35,7 +35,7 @@ jobs:
       contents: read
       packages: write
   
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-8-cores
 
     env:
       VCPKG_TARGET_TRIPLET: ${{ matrix.vcpkg_target_triplet }}
@@ -105,7 +105,7 @@ jobs:
         	Enter-VsDevShell -VsInstallPath ${vsInstallationPath} -Arch ${{ matrix.VsDevShellArch }}
         popd
         cmake --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
-        cmake --build --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }} -j 1
+        cmake --build --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
         ctest --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
 
     - name: CMake Workflow (non VsDevShell)
@@ -113,7 +113,7 @@ jobs:
       shell: pwsh
       run: |
         cmake --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
-        cmake --build --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }} -j 1
+        cmake --build --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
         ctest --preset ci-${{ matrix.generator }}-${{ matrix.vcpkg_target_triplet }}-${{ matrix.build_type }}
 
     - name: Archive VCPKG Log Files
