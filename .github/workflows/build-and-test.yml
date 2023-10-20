@@ -88,6 +88,12 @@ jobs:
             -source "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
         ${{matrix.mono}} $((./vcpkg/vcpkg fetch nuget) | tail -n 1) sources
       
+    - name: Print VsDevShells
+      if: ${{ matrix.os == 'windows-2022' }}
+      shell: pwsh
+      run: |
+        & "${env:ProgramFiles(x86)}/Microsoft Visual Studio/Installer/vswhere.exe" -requires "Microsoft.VisualStudio.Component.Windows11SDK.*"
+      
     - name: Configure (VsDevShell)
       if: ${{ matrix.os == 'windows-2022' }}
       shell: pwsh
