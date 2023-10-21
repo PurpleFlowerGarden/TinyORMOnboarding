@@ -9,7 +9,7 @@
     {
       "name": "base",
       "cacheVariables": {
-        "VCPKG_INSTALL_OPTIONS": "--debug",
+        "VCPKG_INSTALL_OPTIONS": "--debug;--allow-unsupported",
         "VCPKG_VERBOSE": "ON",
         "VCPKG_APPLOCAL_DEPS": "OFF"
       },
