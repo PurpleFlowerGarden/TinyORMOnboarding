@@ -169,9 +169,9 @@ namespace MyNamespace
 							{ "column value", query.value(record.fieldName(i)).toString() }
 						}).toJson().constData();
 				}
-			}
 
-			QVERIFY((QStringList() << "johndoe@domain.org" << "janedoe@domain.org").contains(query.value("user_email")));
+				QVERIFY((QStringList() << "johndoe@domain.org" << "janedoe@domain.org").contains(query.value("user_email")));
+			}
 
 			Orm::Schema::drop("users");
 			Orm::DB::commit();
