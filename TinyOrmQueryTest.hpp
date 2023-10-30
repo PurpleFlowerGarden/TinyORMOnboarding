@@ -27,6 +27,7 @@ namespace MyNamespace
 
         void helloWorld();
         void invalidInsert();
+        void columnAlias();
 
     private:
         std::shared_ptr<Orm::DatabaseManager> m_db;
