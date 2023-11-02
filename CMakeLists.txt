@@ -31,10 +31,10 @@ set_target_properties(TinyOrmQueryTest PROPERTIES MSVC_RUNTIME_LIBRARY ${MSVC_RU
 
 enable_testing()
 
-add_test(NAME QSqlQueryTest COMMAND QSqlQueryTest -o "${CMAKE_CURRENT_BINARY_DIR}/QSqlQueryTest.xml,junitxml" COMMAND_EXPAND_LISTS)
+add_test(NAME QSqlQueryTest COMMAND QSqlQueryTest -o -,txt -o "${CMAKE_CURRENT_BINARY_DIR}/QSqlQueryTest.xml,junitxml" COMMAND_EXPAND_LISTS)
 set_property(TEST QSqlQueryTest PROPERTY ENVIRONMENT_MODIFICATION "PATH=path_list_prepend:${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}$<$<CONFIG:Debug>:/debug>/bin")
 set_property(TEST QSqlQueryTest APPEND PROPERTY ENVIRONMENT_MODIFICATION "QT_PLUGIN_PATH=set:${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}$<$<CONFIG:Debug>:/debug>/Qt6/plugins")
 
-add_test(NAME TinyOrmQueryTest COMMAND TinyOrmQueryTest -o "${CMAKE_CURRENT_BINARY_DIR}/TinyOrmQueryTest.xml,junitxml" COMMAND_EXPAND_LISTS)
+add_test(NAME TinyOrmQueryTest COMMAND TinyOrmQueryTest -o -,txt -o "${CMAKE_CURRENT_BINARY_DIR}/TinyOrmQueryTest.xml,junitxml" COMMAND_EXPAND_LISTS)
 set_property(TEST TinyOrmQueryTest PROPERTY ENVIRONMENT_MODIFICATION "PATH=path_list_prepend:${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}$<$<CONFIG:Debug>:/debug>/bin")
 set_property(TEST TinyOrmQueryTest APPEND PROPERTY ENVIRONMENT_MODIFICATION "QT_PLUGIN_PATH=set:${_VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}$<$<CONFIG:Debug>:/debug>/Qt6/plugins")

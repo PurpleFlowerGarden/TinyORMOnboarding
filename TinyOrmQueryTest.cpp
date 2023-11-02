@@ -1,3 +1,7 @@
+#include <QtCore/QJsonDocument>
+#include <QtCore/QJsonObject>
+#include <QtSql/QSqlRecord>
+
 #include "TinyOrmQueryTest.hpp"
 
 namespace MyNamespace
@@ -119,6 +123,64 @@ namespace MyNamespace
 		
 		QVERIFY(exceptionReceived);
 		QCOMPARE(rowCount, 2);
+	}
+
+	void MyTinyTest::columnAlias()
+	{
+		try {
+			
+			Orm::DB::beginTransaction();
+			Orm::Schema::create(
+				"users",
+				[](Orm::SchemaNs::Blueprint &table)
+				{
+					table.id();
+					table.text("email").nullable();
+					table.text("name").nullable();
+				}
+			);
+			
+			Orm::DB::table("users")->insertGetId(
+				QVariantMap{
+					{"name", "John Doe"},
+					{"email", "johndoe@domain.org"}
+				}
+			);
+
+			Orm::DB::table("users")->insertGetId(
+				QVariantMap{
+					{"name", "Jane Doe"},
+					{"email", "janedoe@domain.org"}
+				}
+			);
+
+			QSqlQuery query = Orm::DB::table("users")
+				->select({"name", "email AS user_email"})
+				.get();
+            
+			for(int n=0; query.next(); ++n) {
+				QSqlRecord record(query.record());
+				for(int i=0; i<record.count(); ++i) {
+					qDebug() << QJsonDocument(
+						QJsonObject{
+							{ "row number", n },
+							{ "column index", i },
+							{ "column name", record.fieldName(i) },
+							{ "column value", query.value(record.fieldName(i)).toString() }
+						}).toJson().constData();
+				}
+
+				QVERIFY((QStringList() << "johndoe@domain.org" << "janedoe@domain.org").contains(query.value("user_email")));
+			}
+
+			Orm::Schema::drop("users");
+			Orm::DB::commit();
+		}
+		catch (const std::exception &ex)
+		{
+			Orm::DB::rollBack();
+			qCritical() << ex.what();
+		}
 	}
 }
 
